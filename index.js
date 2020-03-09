@@ -8,8 +8,8 @@ const puppeteer = require('puppeteer')
 const server = express()
 
 const render = async ({ url, width, height, fullPage }) => {
-  const setWidth = width || 800 
-  const setHeight = height || 600
+  const setWidth = parseInt(width) || 800 
+  const setHeight = parseInt(height) || 600
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
   await page.setViewport({
