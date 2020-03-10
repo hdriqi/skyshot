@@ -4,6 +4,12 @@ const SDK = require('./lib/sdk')
 const express = require('express')
 const bodyParser = require('body-parser')
 const puppeteer = require('puppeteer')
+const next = require('next')
+
+const app = next({
+  dev: true
+})
+const handle = app.getRequestHandler()
 
 const server = express()
 
@@ -12,6 +18,7 @@ const render = async ({ url, width, height, fullPage }) => {
   const setHeight = parseInt(height) || 600
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
+  await page.setBypassCSP(true)
   await page.setViewport({
     width: setWidth,
     height: setHeight,
@@ -19,51 +26,37 @@ const render = async ({ url, width, height, fullPage }) => {
   })
   await page.goto(url, { waitUntil: ['load', 'networkidle0'], timeout: 60000 })
   const filePath = path.join(__dirname, 'screenshots', `${new Date().getTime()}.png`)
-  if(fullPage) {
-    await page.addScriptTag({url: 'https://html2canvas.hertzen.com/dist/html2canvas.js'})
-    await page.addScriptTag({url: 'https://cdn.jsdelivr.net/npm/canvas2image@1.0.5/canvas2image.min.js'})
-
-    const screenshot = await page.evaluate(async () => {
-      const canvasElement = await html2canvas(document.body)
-   
-      let image = Canvas2Image.convertToImage(
-        canvasElement,
-        canvasElement.width,
-        canvasElement.height,
-        'png'
-       )
-       return image.src
-   })
-   const data = screenshot.replace(/^data:image\/\w+;base64,/, '')
-   const buf = Buffer.from(data, 'base64')
-   fs.writeFileSync(filePath, buf)
-  } 
-  else {
-    await page.screenshot({
-      path: filePath
-    })
-  }
+  await page.screenshot({
+    path: filePath,
+    fullPage: fullPage
+  })
   const response = await SDK.UploadFile(filePath, SDK.DefaultUploadOptions)
   fs.unlinkSync(filePath)
+  browser.close()
+
   return response
 }
 
 const main = async () => {
+  await app.prepare()
   server.use(bodyParser.urlencoded({ extended: false }))
   server.use(bodyParser.json())
 
-  server.get('/render', async (req, res) => {
+  server.post('/render', async (req, res) => {
     const data = await render({
-      url: req.query.url,
-      width: req.query.width,
-      height: req.query.height,
-      fullPage: req.query.fullPage
+      url: req.body.url,
+      width: req.body.width,
+      height: req.body.height,
+      fullPage: req.body.fullPage
     })
-    res.json(data)
+    res.json({
+      success: 1,
+      data: data
+    })
   })
 
-  server.get('/', (req, res) => {
-    res.send('ok')
+  server.get('*', (req, res) => {
+    return handle(req, res)
   })
 
   server.listen(8080, (err) => {
