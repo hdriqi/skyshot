@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer')
 const next = require('next')
 
 const app = next({
-  dev: true
+  dev: process.env.NODE_ENV === 'production' ? false : true
 })
 const handle = app.getRequestHandler()
 

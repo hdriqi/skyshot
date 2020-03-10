@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch index.js index.js",
-    "start": "node index.js"
+    "build": "next build",
+    "prestart": "npm run build",
+    "start": "NODE_ENV=production node index.js"
   },
   "author": "",
   "license": "ISC",
