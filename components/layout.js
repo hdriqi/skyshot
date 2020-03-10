@@ -9,7 +9,7 @@ const Layout = ({ children }) => (
       <link href={`/fonts/inter.css`} rel="stylesheet"></link>
 			<link href={`/tailwind.min.css`} rel="stylesheet"></link>
       <title>Skyshot - Free web screenshot powered by Sia</title>
-      <meta name="description" content="Screen capture webpage free stored on decentralized storage system powered by Sia." />
+      <meta name="description" content="Capture and store web page screenshot on decentralized storage. Powered by Sia." />
       <style>
         {
           `

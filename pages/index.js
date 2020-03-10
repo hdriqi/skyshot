@@ -61,7 +61,9 @@ const HomePage = () => {
             color: `#57B560`
           }}>Skyshot</p>
           <p className="mt-2 text-lg text-gray-900">Capture and store web page screenshot on decentralized storage</p>
-          <p className="text-lg text-gray-900">powered by Sia</p>
+          <p className="text-lg text-gray-900">powered by <a href="https://siasky.net" target="_blank" className="font-medium cursor-pointer" style={{
+            color: `#57B560`
+          }}>Sia</a></p>
         </div>
         <form onSubmit={e => _submit(e)} className="px-4" >
           <div className="flex flex-wrap mt-8">
